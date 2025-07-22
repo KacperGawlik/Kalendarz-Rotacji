@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalendarz Rotacji - Norwegia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Menu hamburger button */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: #667eea;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Side menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .menu-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .menu-items {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .menu-item:hover {
+            background: #f0f4ff;
+            padding-left: 2rem;
+        }
+
+        .menu-item.active {
+            background: #ffebeb;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .menu-item-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        /* Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 998;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Main container adjustment */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            min-height: 100vh;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Page sections */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Statistics page styles */
+        .stats-container {
+            padding: 1.5rem;
+        }
+
+        .stats-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .stats-header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Earnings section */
+        .earnings-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .earnings-history {
+            margin-top: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .earning-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .earning-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .earning-info {
+            flex: 1;
+        }
+
+        .earning-amount {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .earning-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .earning-note {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+
+        .delete-earning-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .delete-earning-btn:hover {
+            transform: scale(1.1);
+            background: #ff5252;
+        }
+
+        .earnings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .total-earnings {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .add-earning-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-earning-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .earnings-form {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .earnings-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #48bb78;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .form-buttons button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #e9ecef;
+            color: #666;
+        }
+
+        /* Flights page styles */
+        .flights-container {
+            padding: 1.5rem;
+        }
+
+        .flights-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flights-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .flights-header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .flight-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .flight-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .flight-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .flight-detail {
+            text-align: center;
+        }
+
+        .flight-detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .flight-detail-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .delete-flight-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .delete-flight-btn:hover {
+            transform: scale(1.1);
+            background: #ff5252;
+        }
+
+        .add-flight-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .add-flight-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .flight-form {
+            display: none;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1rem;
+        }
+
+        .flight-form.active {
+            display: block;
+        }
+
+        /* Existing styles */
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 2rem 1.5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50px) translateY(-50px); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .setup-section {
+            padding: 2rem 1.5rem;
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 20px 20px 0 0;
+            margin-top: -20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .edit-section {
+            padding: 1rem 1.5rem;
+            text-align: center;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #ffa726, #fb8c00);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
+        }
+
+        .btn-edit:active {
+            transform: translateY(0);
+        }
+
+        .status-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 0 1.5rem 1rem;
+        }
+
+        .status-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-card.work {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .status-card.rest {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+        }
+
+        .status-number {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-section {
+            padding: 1.5rem;
+            background: white;
+            margin: 1rem 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            flex-grow: 1;
+        }
+
+        .month-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            background: #f8f9fa;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .calendar-day.work {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .calendar-day.rest {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #ffd93d;
+            box-shadow: 0 0 10px rgba(255, 217, 61, 0.5);
+        }
+
+        .upcoming-section {
+            padding: 1.5rem;
+            background: white;
+            margin: 1rem 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .upcoming-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .upcoming-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .upcoming-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .upcoming-item.work {
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .upcoming-item.rest {
+            border-left: 4px solid #51cf66;
+        }
+
+        .upcoming-date {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .upcoming-type {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .upcoming-type.work {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+        }
+
+        .upcoming-type.rest {
+            background: rgba(81, 207, 102, 0.1);
+            color: #51cf66;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .flight-info {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Menu Toggle Button -->
+<button class="menu-toggle" onclick="toggleMenu()">
+    <div>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</button>
+
+<!-- Side Menu -->
+<nav class="side-menu" id="sideMenu">
+    <div class="menu-header">
+        <h2>Menu</h2>
+        <p>Twój asystent pracy</p>
+    </div>
+    <div class="menu-items">
+        <button class="menu-item active" onclick="showPage('calendar')">
+            <span class="menu-item-icon">📅</span>
+            <span>Kalendarz Rotacyjny</span>
+        </button>
+        <button class="menu-item" onclick="showPage('statistics')">
+            <span class="menu-item-icon">📊</span>
+            <span>Statystyki</span>
+        </button>
+        <button class="menu-item" onclick="showPage('flights')">
+            <span class="menu-item-icon">✈️</span>
+            <span>Loty</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Menu Overlay -->
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+<!-- Main Container -->
+<div class="container">
+    <!-- Calendar Page -->
+    <div id="calendarPage" class="page-section active">
+        <div class="header">
+            <h1>Twój kalendarz pracy w Norwegii</h1>
+        </div>
+
+        <div id="setupSection" class="setup-section">
+            <div class="input-group">
+                <label for="lastDeparture">Data ostatniego wylotu do Norwegii:</label>
+                <input type="date" id="lastDeparture" />
+            </div>
+            <button class="btn pulse" onclick="calculateRotations()">
+                Oblicz rotacje na cały rok
+            </button>
+        </div>
+
+        <div id="mainApp" class="hidden">
+            <div class="edit-section">
+                <button class="btn-edit" onclick="showEditSection()">
+                    ✏️ Edytuj rotacje
+                </button>
+            </div>
+
+            <div class="status-cards fade-in">
+                <div class="status-card" id="currentStatus">
+                    <div class="status-number" id="currentDays">-</div>
+                    <div class="status-label" id="currentLabel">Obecnie</div>
+                </div>
+                <div class="status-card" id="nextStatus">
+                    <div class="status-number" id="nextDays">-</div>
+                    <div class="status-label" id="nextLabel">Następne</div>
+                </div>
+            </div>
+
+            <div class="calendar-section fade-in">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendarTitle">Styczeń 2025</div>
+                    <div class="month-nav">
+                        <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+                        <button class="nav-btn" onclick="changeMonth(1)">›</button>
+                    </div>
+                </div>
+                <div class="calendar" id="calendar">
+                    <!-- Calendar will be generated here -->
+                </div>
+            </div>
+
+            <div class="upcoming-section fade-in">
+                <div class="upcoming-title">Najbliższe wydarzenia</div>
+                <div id="upcomingEvents">
+                    <!-- Upcoming events will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Page -->
+    <div id="statisticsPage" class="page-section">
+        <div class="stats-header">
+            <h1>Statystyki Pracy</h1>
+            <p>Twoje podsumowanie roku</p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="workDays">0</div>
+                    <div class="stat-label">Dni w Norwegii</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="restDays">0</div>
+                    <div class="stat-label">Dni w Polsce</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="workWeeks">0</div>
+                    <div class="stat-label">Tygodni w Norwegii</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="restWeeks">0</div>
+                    <div class="stat-label">Tygodni w Polsce</div>
+                </div>
+            </div>
+
+            <div class="earnings-section">
+                <div class="earnings-header">
+                    <div>
+                        <h3>Zarobki</h3>
+                        <div class="total-earnings" id="totalEarnings">0 NOK</div>
+                    </div>
+                    <button class="add-earning-btn" onclick="toggleEarningsForm()">
+                        + Dodaj wpłatę
+                    </button>
+                </div>
+
+                <div class="earnings-form" id="earningsForm">
+                    <div class="form-group">
+                        <label for="earningAmount">Kwota (NOK):</label>
+                        <input type="number" id="earningAmount" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="earningDate">Data:</label>
+                        <input type="date" id="earningDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="earningNote">Notatka (opcjonalnie):</label>
+                        <input type="text" id="earningNote" placeholder="np. Wynagrodzenie za styczeń">
+                    </div>
+                    <div class="form-buttons">
+                        <button class="save-btn" onclick="saveEarning()">Zapisz</button>
+                        <button class="cancel-btn" onclick="toggleEarningsForm()">Anuluj</button>
+                    </div>
+                </div>
+
+                <div class="earnings-history" id="earningsHistory">
+                    <!-- Earnings history will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flights Page -->
+    <div id="flightsPage" class="page-section">
+        <div class="flights-header">
+            <h1>Moje Loty</h1>
+            <p>Zarządzaj informacjami o lotach</p>
+        </div>
+
+        <div class="flights-container">
+            <button class="add-flight-btn" onclick="toggleFlightForm()">
+                + Dodaj nowy lot
+            </button>
+
+            <div class="flight-form" id="flightForm">
+                <div class="form-group">
+                    <label for="flightNumber">Numer lotu:</label>
+                    <input type="text" id="flightNumber" placeholder="np. FR1234">
+                </div>
+                <div class="form-group">
+                    <label for="flightGate">Numer bramki (Gate):</label>
+                    <input type="text" id="flightGate" placeholder="np. A12">
+                </div>
+                <div class="form-group">
+                    <label for="flightSeat">Numer miejsca:</label>
+                    <input type="text" id="flightSeat" placeholder="np. 15F">
+                </div>
+                <div class="form-group">
+                    <label for="flightDate">Data lotu:</label>
+                    <input type="date" id="flightDate">
+                </div>
+                <div class="form-group">
+                    <label for="flightDirection">Kierunek:</label>
+                    <select id="flightDirection" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;">
+                        <option value="toNorway">Do Norwegii</option>
+                        <option value="toPoland">Do Polski</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button class="save-btn" onclick="saveFlight()">Zapisz</button>
+                    <button class="cancel-btn" onclick="toggleFlightForm()">Anuluj</button>
+                </div>
+            </div>
+
+            <div id="flightsList">
+                <!-- Flights will be displayed here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let rotationData = [];
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    let earnings = [];
+    let flights = [];
+
+    const monthNames = [
+        'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+        'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
+    ];
+
+    const dayNames = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb'];
+
+    // Load saved data on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        loadSavedData();
+        loadEarnings();
+        loadFlights();
+    });
+
+    // Menu functions
+    function toggleMenu() {
+        const menu = document.getElementById('sideMenu');
+        const overlay = document.getElementById('menuOverlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    function showPage(pageName) {
+        // Hide all pages
+        document.querySelectorAll('.page-section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Show selected page
+        document.getElementById(pageName + 'Page').classList.add('active');
+
+        // Update menu active state
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        event.target.closest('.menu-item').classList.add('active');
+
+        // Close menu
+        toggleMenu();
+
+        // Update statistics if showing statistics page
+        if (pageName === 'statistics') {
+            updateStatistics();
+            displayEarnings();
+        }
+    }
+
+    function saveRotationData(lastDeparture) {
+        const dataToSave = {
+            lastDeparture: lastDeparture.toISOString(),
+            savedAt: new Date().toISOString()
+        };
+        // Save to localStorage (works in Android WebView)
+        try {
+            localStorage.setItem('rotationData', JSON.stringify(dataToSave));
+        } catch (error) {
+            console.log('LocalStorage not available, using memory storage');
+            window.savedRotationData = dataToSave;
+        }
+
+        // Send data to Android widget if available
+        if (typeof AndroidWidget !== 'undefined') {
+            const widgetData = {
+                lastDeparture: lastDeparture.toISOString(),
+                rotations: rotationData.map(r => ({
+                    start: r.start.toISOString(),
+                    end: r.end.toISOString(),
+                    type: r.type
+                }))
+            };
+            AndroidWidget.updateWidgetData(JSON.stringify(widgetData));
+        }
+    }
+
+    function loadSavedData() {
+        try {
+            // Try to load from localStorage first
+            const savedData = localStorage.getItem('rotationData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                const lastDeparture = new Date(parsedData.lastDeparture);
+
+                calculateRotationsFromDate(lastDeparture);
+
+                document.getElementById('setupSection').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+
+                updateStatusCards();
+                generateCalendar();
+                generateUpcomingEvents();
+                return;
+            }
+        } catch (error) {
+            console.log('Error loading from localStorage:', error);
+        }
+
+        // Fallback to memory storage
+        if (window.savedRotationData) {
+            const savedData = window.savedRotationData;
+            const lastDeparture = new Date(savedData.lastDeparture);
+
+            calculateRotationsFromDate(lastDeparture);
+
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+
+            updateStatusCards();
+            generateCalendar();
+            generateUpcomingEvents();
+        } else {
+            // No saved data, show setup section
+            document.getElementById('setupSection').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+    }
+
+    function showEditSection() {
+        // Show setup section for editing
+        document.getElementById('setupSection').classList.remove('hidden');
+        document.getElementById('mainApp').classList.add('hidden');
+
+        // If there's saved data, pre-fill the input
+        try {
+            const savedData = localStorage.getItem('rotationData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                const savedDate = new Date(parsedData.lastDeparture);
+                document.getElementById('lastDeparture').valueAsDate = savedDate;
+            }
+        } catch (error) {
+            if (window.savedRotationData) {
+                const savedDate = new Date(window.savedRotationData.lastDeparture);
+                document.getElementById('lastDeparture').valueAsDate = savedDate;
+            }
+        }
+    }
+
+    function calculateRotations() {
+        const lastDepartureInput = document.getElementById('lastDeparture');
+        const lastDeparture = new Date(lastDepartureInput.value);
+
+        if (!lastDeparture || isNaN(lastDeparture.getTime())) {
+            alert('Proszę wprowadź datę ostatniego wylotu.');
+            return;
+        }
+
+        // Save the data for future use
+        saveRotationData(lastDeparture);
+
+        // Calculate rotations
+        calculateRotationsFromDate(lastDeparture);
+
+        document.getElementById('setupSection').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+
+        updateStatusCards();
+        generateCalendar();
+        generateUpcomingEvents();
+    }
+
+    function calculateRotationsFromDate(lastDeparture) {
+        // Generate rotations for the whole year
+        rotationData = [];
+        let currentDate = new Date(lastDeparture);
+        let isWorking = true; // Starting with work period
+
+        // Generate rotations for next 365 days
+        for (let i = 0; i < 15; i++) { // About 15 rotations in a year (35-day cycles)
+            let endDate = new Date(currentDate);
+
+            if (isWorking) {
+                // Work period: 15 days in Norway (Tuesday to Tuesday, 2 weeks)
+                endDate.setDate(endDate.getDate() + 13); // Work ends on Tuesday (day before return)
+
+                // Ensure work ends on Tuesday (day 2)
+                while (endDate.getDay() !== 2) {
+                    endDate.setDate(endDate.getDate() + 1);
+                }
+            } else {
+                // Rest period in Poland (starts Wednesday after return)
+                endDate.setDate(endDate.getDate() + 20); // approximately 3 weeks
+
+                // Ensure rest ends on Monday (day 1) - day before next departure
+                while (endDate.getDay() !== 1) {
+                    endDate.setDate(endDate.getDate() - 1);
+                }
+            }
+
+            rotationData.push({
+                start: new Date(currentDate),
+                end: new Date(endDate),
+                type: isWorking ? 'work' : 'rest'
+            });
+
+            // Move to next period start date (day after current period ends)
+            currentDate = new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1);
+            isWorking = !isWorking;
+        }
+    }
+
+    function updateStatusCards() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+
+        let currentRotation = rotationData.find(rotation =>
+            today >= rotation.start && today <= rotation.end
+        );
+
+        if (currentRotation) {
+            const daysLeft = Math.ceil((currentRotation.end - today) / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById('currentDays').textContent = daysLeft;
+            document.getElementById('currentLabel').textContent =
+                currentRotation.type === 'work' ? 'Dni do powrotu' : 'Dni odpoczynku';
+            document.getElementById('currentStatus').className =
+                `status-card ${currentRotation.type}`;
+        }
+
+        // Find next rotation
+        let nextRotation = rotationData.find(rotation => rotation.start > today);
+        if (nextRotation) {
+            const daysUntil = Math.ceil((nextRotation.start - today) / (1000 * 60 * 60 * 24));
+            document.getElementById('nextDays').textContent = daysUntil;
+            document.getElementById('nextLabel').textContent =
+                nextRotation.type === 'work' ? 'Dni do wylotu' : 'Dni do odpoczynku';
+            document.getElementById('nextStatus').className =
+                `status-card ${nextRotation.type}`;
+        }
+    }
+
+    function generateCalendar() {
+        const calendar = document.getElementById('calendar');
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDay = firstDay.getDay();
+
+        document.getElementById('calendarTitle').textContent =
+            `${monthNames[currentMonth]} ${currentYear}`;
+
+        calendar.innerHTML = '';
+
+        // Add day headers
+        dayNames.forEach(day => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = day;
+            calendar.appendChild(dayHeader);
+        });
+
+        // Add empty cells for days before month starts
+        for (let i = 0; i < startingDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day';
+            calendar.appendChild(emptyDay);
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.textContent = day;
+
+            const currentDate = new Date(currentYear, currentMonth, day);
+            const today = new Date();
+
+            // Check if this day is today
+            if (currentDate.toDateString() === today.toDateString()) {
+                dayElement.classList.add('today');
+            }
+
+            // Check rotation status for this day
+            const rotation = rotationData.find(rotation => {
+                const checkDate = new Date(currentDate);
+                checkDate.setHours(0, 0, 0, 0);
+                const rotationStart = new Date(rotation.start);
+                rotationStart.setHours(0, 0, 0, 0);
+                const rotationEnd = new Date(rotation.end);
+                rotationEnd.setHours(0, 0, 0, 0);
+                return checkDate >= rotationStart && checkDate <= rotationEnd;
+            });
+
+            if (rotation) {
+                dayElement.classList.add(rotation.type);
+            }
+
+            calendar.appendChild(dayElement);
+        }
+    }
+
+    function generateUpcomingEvents() {
+        const upcomingEvents = document.getElementById('upcomingEvents');
+        const today = new Date();
+
+        // Get next 5 rotation changes
+        let events = [];
+        rotationData.forEach(rotation => {
+            if (rotation.start > today) {
+                events.push({
+                    date: rotation.start,
+                    type: rotation.type,
+                    label: rotation.type === 'work' ? 'Wylot do Norwegii' : 'Powrót do Polski'
+                });
+            }
+        });
+
+        events = events.slice(0, 5); // Only show next 5 events
+
+        upcomingEvents.innerHTML = '';
+        events.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = `upcoming-item ${event.type}`;
+
+            eventElement.innerHTML = `
+                <div class="upcoming-date">${event.date.toLocaleDateString('pl-PL')}</div>
+                <div class="upcoming-type ${event.type}">${event.label}</div>
+            `;
+
+            upcomingEvents.appendChild(eventElement);
+        });
+    }
+
+    function changeMonth(direction) {
+        currentMonth += direction;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        } else if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        generateCalendar();
+    }
+
+    // Statistics functions
+    function updateStatistics() {
+        if (rotationData.length === 0) return;
+
+        const today = new Date();
+        const yearStart = new Date(today.getFullYear(), 0, 1);
+        const yearEnd = new Date(today.getFullYear(), 11, 31);
+
+        let workDays = 0;
+        let restDays = 0;
+
+        // Calculate days for each rotation in the current year
+        rotationData.forEach(rotation => {
+            const start = rotation.start > yearStart ? rotation.start : yearStart;
+            const end = rotation.end < yearEnd ? rotation.end : yearEnd;
+
+            if (start <= end) {
+                const days = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                if (rotation.type === 'work') {
+                    workDays += days;
+                } else {
+                    restDays += days;
+                }
+            }
+        });
+
+        document.getElementById('workDays').textContent = workDays;
+        document.getElementById('restDays').textContent = restDays;
+        document.getElementById('workWeeks').textContent = Math.floor(workDays / 7);
+        document.getElementById('restWeeks').textContent = Math.floor(restDays / 7);
+    }
+
+    // Earnings functions
+    function toggleEarningsForm() {
+        const form = document.getElementById('earningsForm');
+        form.classList.toggle('active');
+
+        // Clear form when opening
+        if (form.classList.contains('active')) {
+            document.getElementById('earningAmount').value = '';
+            document.getElementById('earningDate').valueAsDate = new Date();
+            document.getElementById('earningNote').value = '';
+        }
+    }
+
+    function saveEarning() {
+        const amount = parseFloat(document.getElementById('earningAmount').value);
+        const date = document.getElementById('earningDate').value;
+        const note = document.getElementById('earningNote').value;
+
+        if (!amount || amount <= 0) {
+            alert('Proszę wprowadź prawidłową kwotę');
+            return;
+        }
+
+        const earning = {
+            id: Date.now(),
+            amount: amount,
+            date: date,
+            note: note
+        };
+
+        earnings.push(earning);
+        saveEarnings();
+        updateTotalEarnings();
+        displayEarnings();
+        toggleEarningsForm();
+    }
+
+    function saveEarnings() {
+        try {
+            localStorage.setItem('earnings', JSON.stringify(earnings));
+        } catch (error) {
+            console.log('Could not save earnings to localStorage');
+            window.savedEarnings = earnings;
+        }
+    }
+
+    function loadEarnings() {
+        try {
+            const saved = localStorage.getItem('earnings');
+            if (saved) {
+                earnings = JSON.parse(saved);
+                updateTotalEarnings();
+                displayEarnings();
+            }
+        } catch (error) {
+            if (window.savedEarnings) {
+                earnings = window.savedEarnings;
+                updateTotalEarnings();
+                displayEarnings();
+            }
+        }
+    }
+
+    function displayEarnings() {
+        const earningsHistory = document.getElementById('earningsHistory');
+        earningsHistory.innerHTML = '';
+
+        // Sort earnings by date (newest first)
+        const sortedEarnings = [...earnings].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        sortedEarnings.forEach(earning => {
+            const earningItem = document.createElement('div');
+            earningItem.className = 'earning-item';
+
+            earningItem.innerHTML = `
+                <div class="earning-info">
+                    <div class="earning-amount">${earning.amount.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NOK</div>
+                    <div class="earning-date">${new Date(earning.date).toLocaleDateString('pl-PL')}</div>
+                    ${earning.note ? `<div class="earning-note">${earning.note}</div>` : ''}
+                </div>
+                <button class="delete-earning-btn" onclick="deleteEarning(${earning.id})">×</button>
+            `;
+
+            earningsHistory.appendChild(earningItem);
+        });
+    }
+
+    function deleteEarning(id) {
+        if (confirm('Czy na pewno chcesz usunąć tę wpłatę?')) {
+            earnings = earnings.filter(earning => earning.id !== id);
+            saveEarnings();
+            updateTotalEarnings();
+            displayEarnings();
+        }
+    }
+
+    function deleteEarning(id) {
+        if (confirm('Czy na pewno chcesz usunąć tę wpłatę?')) {
+            earnings = earnings.filter(earning => earning.id !== id);
+            saveEarnings();
+            updateTotalEarnings();
+            displayEarnings();
+        }
+    }
+
+    function updateTotalEarnings() {
+        const total = earnings.reduce((sum, earning) => sum + earning.amount, 0);
+        document.getElementById('totalEarnings').textContent =
+            total.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' NOK';
+    }
+
+    // Flight functions
+    function toggleFlightForm() {
+        const form = document.getElementById('flightForm');
+        form.classList.toggle('active');
+
+        // Clear form when opening
+        if (form.classList.contains('active')) {
+            document.getElementById('flightNumber').value = '';
+            document.getElementById('flightGate').value = '';
+            document.getElementById('flightSeat').value = '';
+            document.getElementById('flightDate').valueAsDate = new Date();
+            document.getElementById('flightDirection').value = 'toNorway';
+        }
+    }
+
+    function saveFlight() {
+        const flightNumber = document.getElementById('flightNumber').value;
+        const gate = document.getElementById('flightGate').value;
+        const seat = document.getElementById('flightSeat').value;
+        const date = document.getElementById('flightDate').value;
+        const direction = document.getElementById('flightDirection').value;
+
+        if (!flightNumber || !date) {
+            alert('Proszę wypełnij numer lotu i datę');
+            return;
+        }
+
+        const flight = {
+            id: Date.now(),
+            flightNumber: flightNumber,
+            gate: gate,
+            seat: seat,
+            date: date,
+            direction: direction
+        };
+
+        flights.push(flight);
+        saveFlights();
+        displayFlights();
+        toggleFlightForm();
+    }
+
+    function saveFlights() {
+        try {
+            localStorage.setItem('flights', JSON.stringify(flights));
+        } catch (error) {
+            console.log('Could not save flights to localStorage');
+            window.savedFlights = flights;
+        }
+    }
+
+    function loadFlights() {
+        try {
+            const saved = localStorage.getItem('flights');
+            if (saved) {
+                flights = JSON.parse(saved);
+                displayFlights();
+            }
+        } catch (error) {
+            if (window.savedFlights) {
+                flights = window.savedFlights;
+                displayFlights();
+            }
+        }
+    }
+
+    function displayFlights() {
+        const flightsList = document.getElementById('flightsList');
+        flightsList.innerHTML = '';
+
+        // Sort flights by date (newest first)
+        const sortedFlights = [...flights].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        sortedFlights.forEach(flight => {
+            const flightCard = document.createElement('div');
+            flightCard.className = 'flight-card';
+
+            const directionText = flight.direction === 'toNorway' ? 'Do Norwegii' : 'Do Polski';
+            const directionIcon = flight.direction === 'toNorway' ? '🇳🇴' : '🇵🇱';
+
+            flightCard.innerHTML = `
+                <button class="delete-flight-btn" onclick="deleteFlight(${flight.id})">×</button>
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <div style="font-size: 2rem;">${directionIcon}</div>
+                    <div style="font-weight: 600; color: #666;">${directionText}</div>
+                    <div style="color: #999; font-size: 0.9rem;">${new Date(flight.date).toLocaleDateString('pl-PL')}</div>
+                </div>
+                <div class="flight-info">
+                    <div class="flight-detail">
+                        <div class="flight-detail-label">Numer lotu</div>
+                        <div class="flight-detail-value">${flight.flightNumber}</div>
+                    </div>
+                    <div class="flight-detail">
+                        <div class="flight-detail-label">Bramka</div>
+                        <div class="flight-detail-value">${flight.gate || '-'}</div>
+                    </div>
+                    <div class="flight-detail">
+                        <div class="flight-detail-label">Miejsce</div>
+                        <div class="flight-detail-value">${flight.seat || '-'}</div>
+                    </div>
+                </div>
+            `;
+
+            flightsList.appendChild(flightCard);
+        });
+    }
+
+    function deleteFlight(id) {
+        if (confirm('Czy na pewno chcesz usunąć ten lot?')) {
+            flights = flights.filter(flight => flight.id !== id);
+            saveFlights();
+            displayFlights();
+        }
+    }
+
+    function deleteFlight(id) {
+        if (confirm('Czy na pewno chcesz usunąć ten lot?')) {
+            flights = flights.filter(flight => flight.id !== id);
+            saveFlights();
+            displayFlights();
+        }
+    }
+
+    // Set default date to today
+    document.getElementById('lastDeparture').valueAsDate = new Date();
+</script>
+</body>
+</html>
