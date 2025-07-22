@@ -534,7 +534,7 @@
         .header {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
-            padding: 2rem 1.5rem 1.5rem;
+            padding: 2rem 1.5rem 2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -570,7 +570,7 @@
             background: white;
             margin-bottom: 1rem;
             border-radius: 20px 20px 0 0;
-            margin-top: -20px;
+            margin-top: 0px;
             position: relative;
             z-index: 2;
         }
@@ -629,7 +629,7 @@
         }
 
         .edit-section {
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem 0.25rem;
             text-align: center;
         }
 
@@ -637,13 +637,13 @@
             background: linear-gradient(135deg, #ffa726, #fb8c00);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            font-size: 0.9rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);
+            box-shadow: 0 3px 10px rgba(255, 167, 38, 0.25);
         }
 
         .btn-edit:hover {
@@ -659,7 +659,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
-            padding: 0 1.5rem 1rem;
+            padding: 0.5rem 1.5rem 1rem;
+            margin-top: 0.5rem;
         }
 
         .status-card {
@@ -1539,12 +1540,17 @@
 
     function displayEarnings() {
         const earningsHistory = document.getElementById('earningsHistory');
+        if (!earningsHistory) {
+            console.error('earningsHistory element not found!');
+            return;
+        }
+
         earningsHistory.innerHTML = '';
 
         // Sort earnings by date (newest first)
         const sortedEarnings = [...earnings].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        sortedEarnings.forEach(earning => {
+        sortedEarnings.forEach((earning, index) => {
             const earningItem = document.createElement('div');
             earningItem.className = 'earning-item';
 
@@ -1562,21 +1568,18 @@
     }
 
     function deleteEarning(id) {
-        if (confirm('Czy na pewno chcesz usunąć tę wpłatę?')) {
-            earnings = earnings.filter(earning => earning.id !== id);
-            saveEarnings();
-            updateTotalEarnings();
-            displayEarnings();
+        // Znajdź element do usunięcia
+        for (let i = 0; i < earnings.length; i++) {
+            if (earnings[i].id == id) {
+                earnings.splice(i, 1);
+                saveEarnings();
+                updateTotalEarnings();
+                displayEarnings();
+                alert('✅ Wpis został usunięty!');
+                return;
+            }
         }
-    }
-
-    function deleteEarning(id) {
-        if (confirm('Czy na pewno chcesz usunąć tę wpłatę?')) {
-            earnings = earnings.filter(earning => earning.id !== id);
-            saveEarnings();
-            updateTotalEarnings();
-            displayEarnings();
-        }
+        alert('❌ Nie znaleziono wpisu do usunięcia');
     }
 
     function updateTotalEarnings() {
@@ -1653,12 +1656,17 @@
 
     function displayFlights() {
         const flightsList = document.getElementById('flightsList');
+        if (!flightsList) {
+            console.error('flightsList element not found!');
+            return;
+        }
+
         flightsList.innerHTML = '';
 
         // Sort flights by date (newest first)
         const sortedFlights = [...flights].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        sortedFlights.forEach(flight => {
+        sortedFlights.forEach((flight, index) => {
             const flightCard = document.createElement('div');
             flightCard.className = 'flight-card';
 
@@ -1693,19 +1701,17 @@
     }
 
     function deleteFlight(id) {
-        if (confirm('Czy na pewno chcesz usunąć ten lot?')) {
-            flights = flights.filter(flight => flight.id !== id);
-            saveFlights();
-            displayFlights();
+        // Znajdź element do usunięcia
+        for (let i = 0; i < flights.length; i++) {
+            if (flights[i].id == id) {
+                flights.splice(i, 1);
+                saveFlights();
+                displayFlights();
+                alert('✅ Lot został usunięty!');
+                return;
+            }
         }
-    }
-
-    function deleteFlight(id) {
-        if (confirm('Czy na pewno chcesz usunąć ten lot?')) {
-            flights = flights.filter(flight => flight.id !== id);
-            saveFlights();
-            displayFlights();
-        }
+        alert('❌ Nie znaleziono lotu do usunięcia');
     }
 
     // Set default date to today
