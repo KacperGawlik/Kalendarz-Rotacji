@@ -1270,74 +1270,165 @@
     }
 
     function calculateRotationsFromDate(lastDeparture) {
-        // Generate rotations for the whole year
-        rotationData = [];
-        let currentDate = new Date(lastDeparture);
-        let isWorking = true; // Starting with work period
+    rotationData = [];
 
-        // Generate rotations for next 365 days
-        for (let i = 0; i < 15; i++) { // About 15 rotations in a year (35-day cycles)
-            let endDate = new Date(currentDate);
+    // KROK 1: Dodaj 19 dni odpoczynku WSTECZ przed datą wylotu
+    // Odpoczynek kończy się w poniedziałek (dzień przed wylotem we wtorek)
+    let restEndBackward = new Date(lastDeparture);
+    restEndBackward.setDate(restEndBackward.getDate() - 1); // Poniedziałek przed wylotem
 
-            if (isWorking) {
-                // Work period: 15 days in Norway (Tuesday to Tuesday, 2 weeks)
-                endDate.setDate(endDate.getDate() + 13); // Work ends on Tuesday (day before return)
+    // Odpoczynek zaczyna się w środę (19 dni wcześniej)
+    let restStartBackward = new Date(restEndBackward);
+    restStartBackward.setDate(restStartBackward.getDate() - 18); // 19 dni total (0-18 = 19 dni)
 
-                // Ensure work ends on Tuesday (day 2)
-                while (endDate.getDay() !== 2) {
-                    endDate.setDate(endDate.getDate() + 1);
-                }
-            } else {
-                // Rest period in Poland (starts Wednesday after return)
-                endDate.setDate(endDate.getDate() + 20); // approximately 3 weeks
+    // Upewnij się że zaczyna w środę (day 3)
+    while (restStartBackward.getDay() !== 3) {
+        restStartBackward.setDate(restStartBackward.getDate() - 1);
+    }
 
-                // Ensure rest ends on Monday (day 1) - day before next departure
-                while (endDate.getDay() !== 1) {
-                    endDate.setDate(endDate.getDate() - 1);
-                }
+    // Dodaj okres odpoczynku wstecz
+    rotationData.push({
+        start: new Date(restStartBackward),
+        end: new Date(restEndBackward),
+        type: 'rest'
+    });
+
+    // KROK 2: Kontynuuj normalny algorytm od daty wylotu
+    let currentDate = new Date(lastDeparture);
+    let isWorking = true; // Starting with work period
+
+    // Generate rotations for next 365 days
+    for (let i = 0; i < 15; i++) { // About 15 rotations in a year (35-day cycles)
+        let endDate = new Date(currentDate);
+
+        if (isWorking) {
+            // Work period: 15 days in Norway (Tuesday to Tuesday, 2 weeks)
+            endDate.setDate(endDate.getDate() + 13); // Work ends on Tuesday (day before return)
+
+            // Ensure work ends on Tuesday (day 2)
+            while (endDate.getDay() !== 2) {
+                endDate.setDate(endDate.getDate() + 1);
             }
+        } else {
+            // Rest period in Poland (starts Wednesday after return)
+            endDate.setDate(endDate.getDate() + 20); // approximately 3 weeks
 
-            rotationData.push({
-                start: new Date(currentDate),
-                end: new Date(endDate),
-                type: isWorking ? 'work' : 'rest'
-            });
-
-            // Move to next period start date (day after current period ends)
-            currentDate = new Date(endDate);
-            currentDate.setDate(currentDate.getDate() + 1);
-            isWorking = !isWorking;
+            // Ensure rest ends on Monday (day 1) - day before next departure
+            while (endDate.getDay() !== 1) {
+                endDate.setDate(endDate.getDate() - 1);
+            }
         }
+
+        rotationData.push({
+            start: new Date(currentDate),
+            end: new Date(endDate),
+            type: isWorking ? 'work' : 'rest'
+        });
+
+        // Move to next period start date (day after current period ends)
+        currentDate = new Date(endDate);
+        currentDate.setDate(currentDate.getDate() + 1);
+        isWorking = !isWorking;
     }
 
+    // KROK 3: Posortuj wszystkie rotacje chronologicznie
+    rotationData.sort((a, b) => a.start - b.start);
+}
     function updateStatusCards() {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time for accurate comparison
 
-        let currentRotation = rotationData.find(rotation =>
-            today >= rotation.start && today <= rotation.end
-        );
+    let currentRotation = rotationData.find(rotation =>
+        today >= rotation.start && today <= rotation.end
+    );
 
-        if (currentRotation) {
+    if (currentRotation) {
+        if (currentRotation.type === 'work') {
+            // Jestem w pracy w Norwegii - pokazuj TYLKO dni do powrotu
             const daysLeft = Math.ceil((currentRotation.end - today) / (1000 * 60 * 60 * 24)) + 1;
-            document.getElementById('currentDays').textContent = daysLeft;
-            document.getElementById('currentLabel').textContent =
-                currentRotation.type === 'work' ? 'Dni do powrotu' : 'Dni odpoczynku';
-            document.getElementById('currentStatus').className =
-                `status-card ${currentRotation.type}`;
-        }
 
-        // Find next rotation
-        let nextRotation = rotationData.find(rotation => rotation.start > today);
-        if (nextRotation) {
-            const daysUntil = Math.ceil((nextRotation.start - today) / (1000 * 60 * 60 * 24));
-            document.getElementById('nextDays').textContent = daysUntil;
-            document.getElementById('nextLabel').textContent =
-                nextRotation.type === 'work' ? 'Dni do wylotu' : 'Dni do odpoczynku';
-            document.getElementById('nextStatus').className =
-                `status-card ${nextRotation.type}`;
+            // Lewa karta - dni do powrotu (aktywna)
+            document.getElementById('currentDays').textContent = daysLeft;
+            document.getElementById('currentLabel').textContent = 'Dni do powrotu';
+            document.getElementById('currentStatus').className = 'status-card work';
+
+            // Prawa karta - dni do wylotu (nieaktywna)
+            document.getElementById('nextDays').textContent = '--';
+            document.getElementById('nextLabel').textContent = 'Dni do wylotu';
+            document.getElementById('nextStatus').className = 'status-card rest';
+
+        } else {
+            // Jestem w Polsce (odpoczynek) - pokazuj TYLKO dni do wylotu
+            const daysLeft = Math.ceil((currentRotation.end - today) / (1000 * 60 * 60 * 24)) + 1;
+
+            // Lewa karta - dni do powrotu (nieaktywna)
+            document.getElementById('currentDays').textContent = '--';
+            document.getElementById('currentLabel').textContent = 'Dni do powrotu';
+            document.getElementById('currentStatus').className = 'status-card work';
+
+            // Prawa karta - dni do wylotu (aktywna)
+            document.getElementById('nextDays').textContent = daysLeft;
+            document.getElementById('nextLabel').textContent = 'Dni do wylotu';
+            document.getElementById('nextStatus').className = 'status-card rest';
         }
+    } else {
+        // Nie znaleziono aktualnej rotacji - pokazuj domyślne wartości
+        document.getElementById('currentDays').textContent = '--';
+        document.getElementById('currentLabel').textContent = 'Dni do powrotu';
+        document.getElementById('currentStatus').className = 'status-card work';
+
+        document.getElementById('nextDays').textContent = '--';
+        document.getElementById('nextLabel').textContent = 'Dni do wylotu';
+        document.getElementById('nextStatus').className = 'status-card rest';
     }
+}function updateStatusCards() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+
+    let currentRotation = rotationData.find(rotation =>
+        today >= rotation.start && today <= rotation.end
+    );
+
+    if (currentRotation) {
+        if (currentRotation.type === 'work') {
+            // Jestem w pracy w Norwegii
+            const daysLeft = Math.ceil((currentRotation.end - today) / (1000 * 60 * 60 * 24)) + 1;
+
+            // Pokazuj dni do powrotu
+            document.getElementById('currentDays').textContent = daysLeft;
+            document.getElementById('currentLabel').textContent = 'Dni do powrotu';
+            document.getElementById('currentStatus').className = 'status-card work';
+
+            // Ukryj dni do wylotu
+            document.getElementById('nextDays').textContent = '--';
+            document.getElementById('nextLabel').textContent = 'Dni do wylotu';
+            document.getElementById('nextStatus').className = 'status-card rest';
+
+        } else {
+            // Jestem w Polsce (odpoczynek)
+            const daysLeft = Math.ceil((currentRotation.end - today) / (1000 * 60 * 60 * 24)) + 1;
+
+            // Ukryj dni do powrotu
+            document.getElementById('currentDays').textContent = '--';
+            document.getElementById('currentLabel').textContent = 'Dni do powrotu';
+            document.getElementById('currentStatus').className = 'status-card work';
+
+            // Pokazuj dni do wylotu
+            document.getElementById('nextDays').textContent = daysLeft;
+            document.getElementById('nextLabel').textContent = 'Dni do wylotu';
+            document.getElementById('nextStatus').className = 'status-card rest';
+        }
+    } else {
+        // Nie znaleziono aktualnej rotacji - pokazuj domyślne wartości
+        document.getElementById('currentDays').textContent = '--';
+        document.getElementById('currentLabel').textContent = 'Dni do powrotu';
+        document.getElementById('currentStatus').className = 'status-card work';
+
+        document.getElementById('nextDays').textContent = '--';
+        document.getElementById('nextLabel').textContent = 'Dni do wylotu';
+        document.getElementById('nextStatus').className = 'status-card rest';
+    }
+}
 
     function generateCalendar() {
         const calendar = document.getElementById('calendar');
