@@ -1,4 +1,4 @@
-package com.example.kalendarz
+package com.example.kalendarz.ui.theme.activities
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.example.kalendarz.R
+import com.example.kalendarz.ui.theme.widgets.RotationWidget
+import android.content.pm.ActivityInfo;
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
@@ -21,9 +24,11 @@ class MainActivity : Activity() {
         val webSettings: WebSettings = webView.settings
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 
         webView.webViewClient = WebViewClient()
-        webView.loadUrl("file:///android_asset/kalendarz.html")
+        webView.loadUrl("file:///android_asset/web/index.html")
     }
 
     // Dodaj do MainActivity

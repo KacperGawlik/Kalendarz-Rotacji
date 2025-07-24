@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalendarz Rotacji - Norwegia</title>
+
+    <!-- Linkuj wszystkie CSS pliki osobno zamiast używać @import -->
+    <link rel="stylesheet" href="css/base/variables.css">
+    <link rel="stylesheet" href="css/base/reset.css">
+    <link rel="stylesheet" href="css/components/menu.css">
+    <link rel="stylesheet" href="css/components/calendar.css">
+    <link rel="stylesheet" href="css/components/statistics.css">
+    <link rel="stylesheet" href="css/components/flights.css">
+    <link rel="stylesheet" href="css/components/forms.css">
+    <link rel="stylesheet" href="css/components/animations.css">
+</head>
+<body>
+<!-- Menu Toggle Button -->
+<button class="menu-toggle" onclick="toggleMenu()">
+    <div>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</button>
+
+<!-- Side Menu -->
+<nav class="side-menu" id="sideMenu">
+    <div class="menu-header">
+        <h2>Menu</h2>
+        <p>Twój asystent pracy</p>
+    </div>
+    <div class="menu-items">
+        <button class="menu-item active" onclick="showPage('calendar')">
+            <span class="menu-item-icon">📅</span>
+            <span>Kalendarz Rotacyjny</span>
+        </button>
+        <button class="menu-item" onclick="showPage('statistics')">
+            <span class="menu-item-icon">📊</span>
+            <span>Statystyki</span>
+        </button>
+        <button class="menu-item" onclick="showPage('flights')">
+            <span class="menu-item-icon">✈️</span>
+            <span>Loty</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Menu Overlay -->
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+<!-- Main Container -->
+<div class="container">
+    <!-- Calendar Page -->
+    <div id="calendarPage" class="page-section active">
+        <div class="header">
+            <h1>Twój kalendarz pracy w Norwegii</h1>
+        </div>
+
+        <div id="setupSection" class="setup-section">
+            <div class="input-group">
+                <label for="lastDeparture">Data ostatniego wylotu do Norwegii:</label>
+                <input type="date" id="lastDeparture" />
+            </div>
+
+
+            <button class="btn pulse" onclick="calculateRotations()">
+                Oblicz rotacje na cały rok
+            </button>
+        </div>
+
+        <div id="mainApp" class="hidden">
+            <div class="edit-section">
+                <button class="btn-edit" onclick="showEditSection()">
+                    ✏️ Edytuj rotacje
+                </button>
+            </div>
+
+            <div class="status-cards fade-in">
+                <div class="status-card" id="currentStatus">
+                    <div class="status-number" id="currentDays">-</div>
+                    <div class="status-label" id="currentLabel">Obecnie</div>
+                </div>
+                <div class="status-card" id="nextStatus">
+                    <div class="status-number" id="nextDays">-</div>
+                    <div class="status-label" id="nextLabel">Następne</div>
+                </div>
+            </div>
+
+            <div class="calendar-section fade-in">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendarTitle">Styczeń 2025</div>
+                    <div class="month-nav">
+                        <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+                        <button class="nav-btn" onclick="changeMonth(1)">›</button>
+                    </div>
+                </div>
+                <div class="calendar" id="calendar">
+                    <!-- Calendar will be generated here -->
+                </div>
+            </div>
+
+            <div class="upcoming-section fade-in">
+                <div class="upcoming-title">Najbliższe wydarzenia</div>
+                <div id="upcomingEvents">
+                    <!-- Upcoming events will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Page -->
+    <div id="statisticsPage" class="page-section">
+        <div class="stats-header">
+            <h1>Statystyki Pracy</h1>
+            <p>Twoje podsumowanie roku</p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="workDays">0</div>
+                    <div class="stat-label">Dni w Norwegii</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="restDays">0</div>
+                    <div class="stat-label">Dni w Polsce</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="workWeeks">0</div>
+                    <div class="stat-label">Tygodni w Norwegii</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="restWeeks">0</div>
+                    <div class="stat-label">Tygodni w Polsce</div>
+                </div>
+            </div>
+
+            <div class="earnings-section">
+                <div class="earnings-header">
+                    <div>
+                        <h3>Zarobki</h3>
+                        <div class="total-earnings" id="totalEarnings">0 NOK</div>
+                    </div>
+                    <button class="add-earning-btn" onclick="toggleEarningsForm()">
+                        + Dodaj wpłatę
+                    </button>
+                </div>
+
+                <div class="earnings-form" id="earningsForm">
+                    <div class="form-group">
+                        <label for="earningAmount">Kwota (NOK):</label>
+                        <input type="number" id="earningAmount" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="earningDate">Data:</label>
+                        <input type="date" id="earningDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="earningNote">Notatka (opcjonalnie):</label>
+                        <input type="text" id="earningNote" placeholder="np. Wynagrodzenie za styczeń">
+                    </div>
+                    <div class="form-buttons">
+                        <button class="save-btn" onclick="saveEarning()">Zapisz</button>
+                        <button class="cancel-btn" onclick="toggleEarningsForm()">Anuluj</button>
+                    </div>
+                </div>
+
+                <div class="earnings-history" id="earningsHistory">
+                    <!-- Earnings history will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flights Page -->
+    <div id="flightsPage" class="page-section">
+        <div class="flights-header">
+            <h1>Moje Loty</h1>
+            <p>Zarządzaj informacjami o lotach</p>
+        </div>
+
+        <div class="flights-container">
+            <button class="add-flight-btn" onclick="toggleFlightForm()">
+                + Dodaj nowy lot
+            </button>
+
+            <div class="flight-form" id="flightForm">
+                <div class="form-group">
+                    <label for="flightNumber">Numer lotu:</label>
+                    <input type="text" id="flightNumber" placeholder="np. FR1234">
+                </div>
+                <div class="form-group">
+                    <label for="flightGate">Numer bramki (Gate):</label>
+                    <input type="text" id="flightGate" placeholder="np. A12">
+                </div>
+                <div class="form-group">
+                    <label for="flightSeat">Numer miejsca:</label>
+                    <input type="text" id="flightSeat" placeholder="np. 15F">
+                </div>
+                <div class="form-group">
+                    <label for="flightDate">Data lotu:</label>
+                    <input type="date" id="flightDate">
+                </div>
+                <div class="form-group">
+                    <label for="flightDirection">Kierunek:</label>
+                    <select id="flightDirection">
+                        <option value="toNorway">Do Norwegii</option>
+                        <option value="toPoland">Do Polski</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button class="save-btn" onclick="saveFlight()">Zapisz</button>
+                    <button class="cancel-btn" onclick="toggleFlightForm()">Anuluj</button>
+                </div>
+            </div>
+
+            <div id="flightsList">
+                <!-- Flights will be displayed here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

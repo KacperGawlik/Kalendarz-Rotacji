@@ -1,10 +1,10 @@
-package com.example.kalendarz
+package com.example.kalendarz.ui.theme.widgets
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
-import android.content.SharedPreferences
 import android.widget.RemoteViews
+import com.example.kalendarz.R
 import org.json.JSONObject
 
 class RotationWidget : AppWidgetProvider() {

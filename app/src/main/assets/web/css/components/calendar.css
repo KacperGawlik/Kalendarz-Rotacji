@@ -1,0 +1,269 @@
+/* Header styles */
+.header {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    color: var(--white);
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    animation: float 20s linear infinite;
+    pointer-events: none;
+}
+
+.header h1 {
+    font-size: var(--font-size-4xl);
+    font-weight: 800;
+    margin-bottom: var(--spacing-sm);
+    position: relative;
+    z-index: 1;
+}
+
+/* Setup section */
+.setup-section {
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    background: var(--white);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+    margin-top: 0px;
+    position: relative;
+    z-index: 2;
+}
+
+.edit-section {
+    padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xs);
+    text-align: center;
+}
+
+.rotation-options {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.rotation-options label {
+    font-weight: 600;
+    font-size: var(--font-size-md);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+
+/* Status cards */
+.status-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-xl) var(--spacing-lg);
+    margin-top: var(--spacing-sm);
+}
+
+.status-card {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.status-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.status-card.work {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    color: var(--white);
+}
+
+.status-card.rest {
+    background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+    color: var(--white);
+}
+
+.status-number {
+    font-size: var(--font-size-5xl);
+    font-weight: 800;
+    margin-bottom: var(--spacing-sm);
+}
+
+.status-label {
+    font-size: var(--font-size-md);
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Calendar section */
+.calendar-section {
+    padding: var(--spacing-xl);
+    background: var(--white);
+    margin: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.calendar-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    flex-grow: 1;
+}
+
+.month-nav {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.nav-btn {
+    background: var(--gray-50);
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day-header {
+    text-align: center;
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.calendar-day:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.calendar-day.work {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    color: var(--white);
+}
+
+.calendar-day.rest {
+    background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+    color: var(--white);
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.calendar-day.today {
+    border: 2px solid #ffd93d;
+    box-shadow: 0 0 10px rgba(255, 217, 61, 0.5);
+}
+
+/* Upcoming events */
+.upcoming-section {
+    padding: var(--spacing-xl);
+    background: var(--white);
+    margin: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.upcoming-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-lg);
+}
+
+.upcoming-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    background: var(--gray-50);
+    transition: var(--transition-normal);
+}
+
+.upcoming-item:hover {
+    background: var(--gray-100);
+    transform: translateX(5px);
+}
+
+.upcoming-item.work {
+    border-left: 4px solid var(--accent-color);
+}
+
+.upcoming-item.rest {
+    border-left: 4px solid var(--success-color);
+}
+
+.upcoming-date {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.upcoming-type {
+    font-size: var(--font-size-md);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--border-radius-xl);
+    font-weight: 600;
+}
+
+.upcoming-type.work {
+    background: rgba(255, 107, 107, 0.1);
+    color: var(--accent-color);
+}
+
+.upcoming-type.rest {
+    background: rgba(81, 207, 102, 0.1);
+    color: var(--success-color);
+}
