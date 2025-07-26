@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/components/flights.css">
     <link rel="stylesheet" href="css/components/forms.css">
     <link rel="stylesheet" href="css/components/animations.css">
+    <link rel="stylesheet" href="css/components/weather.css">
 </head>
 <body>
 <!-- Menu Toggle Button -->
@@ -38,11 +39,15 @@
         </button>
         <button class="menu-item" onclick="showPage('statistics')">
             <span class="menu-item-icon">📊</span>
-            <span>Statystyki</span>
+            <span>Statystyki i Finanse</span>
         </button>
         <button class="menu-item" onclick="showPage('flights')">
             <span class="menu-item-icon">✈️</span>
             <span>Loty</span>
+        </button>
+        <button class="menu-item" onclick="showPage('weather')">
+            <span class="menu-item-icon">🌤️</span>
+            <span>Pogoda</span>
         </button>
     </div>
 </nav>
@@ -63,7 +68,6 @@
                 <label for="lastDeparture">Data ostatniego wylotu do Norwegii:</label>
                 <input type="date" id="lastDeparture" />
             </div>
-
 
             <button class="btn pulse" onclick="calculateRotations()">
                 Oblicz rotacje na cały rok
@@ -113,8 +117,8 @@
     <!-- Statistics Page -->
     <div id="statisticsPage" class="page-section">
         <div class="stats-header">
-            <h1>Statystyki Pracy</h1>
-            <p>Twoje podsumowanie roku</p>
+            <h1>Statystyka i Finanse</h1>
+            <p>Twoje podsumowanie</p>
         </div>
 
         <div class="stats-container">
@@ -137,11 +141,72 @@
                 </div>
             </div>
 
+            <!-- Currency Exchange Section -->
+            <div class="currency-section">
+                <div class="currency-header">
+                    <div class="currency-info">
+                        <h3>💱 Kurs Walut</h3>
+                        <div class="exchange-rate" id="exchangeRate">
+                            <span class="rate-value" id="rateValue">--</span>
+                            <span class="rate-label">NOK/PLN</span>
+                        </div>
+                        <div class="rate-change" id="rateChange">
+                            <span id="changePercent">--%</span>
+                            <span id="changeDirection">📊</span>
+                        </div>
+                    </div>
+                    <div class="currency-actions">
+                        <button class="refresh-rate-btn" onclick="fetchExchangeRate()" id="refreshBtn">
+                            🔄 Odśwież
+                        </button>
+                        <button class="toggle-calculator-btn" onclick="toggleCurrencyCalculator()">
+                            🧮 Kalkulator
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rate-update-info">
+                    <small id="lastUpdate">Ostatnia aktualizacja: --</small>
+                </div>
+
+                <!-- Currency Calculator -->
+                <div class="currency-calculator" id="currencyCalculator">
+                    <div class="calculator-grid">
+                        <div class="conversion-group">
+                            <label>NOK → PLN</label>
+                            <div class="input-with-result">
+                                <input type="number" id="nokInput" placeholder="0.00" step="0.01" onchange="convertNOKToPLN()">
+                                <div class="conversion-result" id="nokResult">= 0.00 PLN</div>
+                            </div>
+                            <div class="quick-buttons">
+                                <button onclick="setNOKAmount(1000)">1k</button>
+                                <button onclick="setNOKAmount(5000)">5k</button>
+                                <button onclick="setNOKAmount(10000)">10k</button>
+                            </div>
+                        </div>
+
+                        <div class="conversion-group">
+                            <label>PLN → NOK</label>
+                            <div class="input-with-result">
+                                <input type="number" id="plnInput" placeholder="0.00" step="0.01" onchange="convertPLNToNOK()">
+                                <div class="conversion-result" id="plnResult">= 0.00 NOK</div>
+                            </div>
+                            <div class="quick-buttons">
+                                <button onclick="setPLNAmount(1000)">1k</button>
+                                <button onclick="setPLNAmount(5000)">5k</button>
+                                <button onclick="setPLNAmount(10000)">10k</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="earnings-section">
                 <div class="earnings-header">
                     <div>
                         <h3>Zarobki</h3>
                         <div class="total-earnings" id="totalEarnings">0 NOK</div>
+                        <div class="total-earnings-pln" id="totalEarningsPLN">≈ 0.00 PLN</div>
                     </div>
                     <button class="add-earning-btn" onclick="toggleEarningsForm()">
                         + Dodaj wpłatę
@@ -221,7 +286,182 @@
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Weather Page -->
+    <div id="weatherPage" class="page-section">
+        <div class="weather-header">
+            <h1>Pogoda</h1>
+            <p>Sprawdź warunki w Norwegii i Polsce</p>
+        </div>
+
+        <div class="weather-container">
+            <!-- Location Settings -->
+            <div class="location-settings">
+                <div class="location-controls">
+                    <button class="location-btn" onclick="getCurrentLocation()">
+                        📍 Użyj mojej lokalizacji
+                    </button>
+                    <button class="settings-btn" onclick="toggleLocationSettings()">
+                        ⚙️ Ustawienia
+                    </button>
+                </div>
+
+                <div class="location-form" id="locationForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="norwayCity">Miasto w Norwegii:</label>
+                            <input type="text" id="norwayCity" placeholder="np. Oslo, Bergen, Stavanger..." value="Oslo">
+                        </div>
+                        <div class="form-group">
+                            <label for="polandCity">Miasto w Polsce:</label>
+                            <input type="text" id="polandCity" placeholder="np. Kraków, Warszawa, Gdańsk..." value="Kraków">
+                        </div>
+                    </div>
+                    <div class="form-buttons">
+                        <button class="save-btn" onclick="saveLocationSettings()">Zapisz</button>
+                        <button class="cancel-btn" onclick="toggleLocationSettings()">Anuluj</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Alerts -->
+            <div class="weather-alerts" id="weatherAlerts">
+                <!-- Weather alerts will appear here -->
+            </div>
+
+            <!-- Current Weather Cards -->
+            <div class="weather-cards">
+                <div class="weather-card norway" id="norwayWeatherCard">
+                    <div class="weather-card-header">
+                        <div class="location-info">
+                            <h3 id="norwayLocation">🇳🇴 Oslo</h3>
+                            <span class="update-time" id="norwayUpdateTime">Aktualizacja: --</span>
+                        </div>
+                        <button class="refresh-weather-btn" onclick="fetchWeatherData('norway')">🔄</button>
+                    </div>
+
+                    <div class="current-weather">
+                        <div class="weather-icon" id="norwayWeatherIcon">⛅</div>
+                        <div class="weather-main">
+                            <div class="temperature" id="norwayTemperature">--°C</div>
+                            <div class="feels-like" id="norwayFeelsLike">Odczuwalna: --°C</div>
+                            <div class="weather-description" id="norwayDescription">--</div>
+                        </div>
+                    </div>
+
+                    <div class="weather-details">
+                        <div class="detail-item">
+                            <span class="detail-label">💧 Wilgotność:</span>
+                            <span class="detail-value" id="norwayHumidity">--%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🌬️ Wiatr:</span>
+                            <span class="detail-value" id="norwayWind">-- km/h</span>
+                        </div>
+                    </div>
+
+                    <div class="clothing-advice" id="norwayClothingAdvice">
+                        <strong>💡 Porada:</strong> <span>Sprawdź pogodę...</span>
+                    </div>
+                </div>
+
+                <div class="weather-card poland" id="polandWeatherCard">
+                    <div class="weather-card-header">
+                        <div class="location-info">
+                            <h3 id="polandLocation">🇵🇱 Kraków</h3>
+                            <span class="update-time" id="polandUpdateTime">Aktualizacja: --</span>
+                        </div>
+                        <button class="refresh-weather-btn" onclick="fetchWeatherData('poland')">🔄</button>
+                    </div>
+
+                    <div class="current-weather">
+                        <div class="weather-icon" id="polandWeatherIcon">⛅</div>
+                        <div class="weather-main">
+                            <div class="temperature" id="polandTemperature">--°C</div>
+                            <div class="feels-like" id="polandFeelsLike">Odczuwalna: --°C</div>
+                            <div class="weather-description" id="polandDescription">--</div>
+                        </div>
+                    </div>
+
+                    <div class="weather-details">
+                        <div class="detail-item">
+                            <span class="detail-label">💧 Wilgotność:</span>
+                            <span class="detail-value" id="polandHumidity">--%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🌬️ Wiatr:</span>
+                            <span class="detail-value" id="polandWind">-- km/h</span>
+                        </div>
+                    </div>
+
+                    <div class="clothing-advice" id="polandClothingAdvice">
+                        <strong>💡 Porada:</strong> <span>Sprawdź pogodę...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forecast for Norway -->
+            <div class="country-forecast">
+                <h3>🇳🇴 Prognoza dla Norwegii</h3>
+                <div class="forecast-city-info" id="norwayForecastCity">
+                    📍 Oslo
+                </div>
+                <div class="forecast-tabs" id="norwayForecastTabs">
+                    <button class="tab-btn active" onclick="showForecast('norway', 'hourly')">Godzinowa</button>
+                    <button class="tab-btn" onclick="showForecast('norway', 'daily')">3-dniowa</button>
+                </div>
+
+                <div class="forecast-content" id="norwayForecastContent">
+                    <!-- Hourly Forecast Norway -->
+                    <div class="forecast-section active" id="norwayHourlyForecast">
+                        <div class="forecast-scroll">
+                            <div class="hourly-items" id="norwayHourlyItems">
+                                <!-- Hourly forecast items for Norway -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Forecast Norway -->
+                    <div class="forecast-section" id="norwayDailyForecast">
+                        <div class="daily-items" id="norwayDailyItems">
+                            <!-- Daily forecast items for Norway -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forecast for Poland -->
+            <div class="country-forecast">
+                <h3>🇵🇱 Prognoza dla Polski</h3>
+                <div class="forecast-city-info" id="polandForecastCity">
+                    📍 Kraków
+                </div>
+                <div class="forecast-tabs" id="polandForecastTabs">
+                    <button class="tab-btn active" onclick="showForecast('poland', 'hourly')">Godzinowa</button>
+                    <button class="tab-btn" onclick="showForecast('poland', 'daily')">3-dniowa</button>
+                </div>
+
+                <div class="forecast-content" id="polandForecastContent">
+                    <!-- Hourly Forecast Poland -->
+                    <div class="forecast-section active" id="polandHourlyForecast">
+                        <div class="forecast-scroll">
+                            <div class="hourly-items" id="polandHourlyItems">
+                                <!-- Hourly forecast items for Poland -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Forecast Poland -->
+                    <div class="forecast-section" id="polandDailyForecast">
+                        <div class="daily-items" id="polandDailyItems">
+                            <!-- Daily forecast items for Poland -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
 
 <script src="js/main.js"></script>
 </body>
